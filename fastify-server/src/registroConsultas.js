@@ -20,12 +20,19 @@ function getRegistroConsultas() {
 }
 
 async function procesarGET(req, res) {
-    return { m: 'GET' };
+    try {
+        const querySnapshot = await getRegistroConsultas().get();
+        const documentos = querySnapshot.docs.map( d => {
+            return d.data();
+        });
+        return documentos;
+    } catch (error) {
+        res.code(500).send({error:error.message})
+    }
 }
 
 async function procesarPOST(req, res) {
     try {
-
         const { nombreIndicador, fechaConsultada } = req.body;
         const consulta = {
             nombreIndicador,
@@ -43,9 +50,27 @@ async function procesarPOST(req, res) {
 }
 
 async function procesarPUT(req, res) {
-    return { m: 'PUT' };
+    try {
+        const { nombreIndicador, fechaConsultada, id } = req.body;
+        const consulta = {
+            nombreIndicador,
+            fechaConsultada
+        }
+        const documento = await getRegistroConsultas().doc(id);
+        documento.update(consulta);
+        return consulta;
+    } catch (error) {
+        res.code(500).send({error: error.message})
+    }
 }
 
 async function procesarDELETE(req, res) {
-    return { m: 'DELETE' };
+    try {
+        const id =req.query.id;
+        const docRef = getRegistroConsultas().doc(id);
+        await docRef.delete();
+        return {borrado: true}
+    } catch(error){
+        return {borrado: false, mensaje: error.message}
+    }
 }
