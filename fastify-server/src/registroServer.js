@@ -5,7 +5,6 @@ module.exports = async (req, res) => {
     const {correo, contrasena } = req.body
 
     try {
-
         const usuario = await admin.auth().createUser({
             email: correo,
             password: contrasena,
